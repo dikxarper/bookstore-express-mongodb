@@ -1,7 +1,7 @@
 const express = require("express")
 const app = express()
 const expressLayouts = require("express-ejs-layouts")
-const dotenv = require("dotenv").config
+require("dotenv").config({ path: ".env" })
 
 const PORT = process.env.PORT || 3000
 
@@ -12,9 +12,12 @@ app.set("layout", "layouts/layout")
 app.use(expressLayouts)
 app.use(express.static("public"))
 
-//connecting mongoDB
+//connecting to mongoDB
 const mongoose = require("mongoose")
-mongoose.connect(process.env.DATABASE_URL)
+mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true })
+const db = mongoose.connection
+db.on("error", (error) => console.log(error))
+db.once("open", () => console.log("Connected to MongoDB"))
 
 app.get("/", (req, res) => {
   res.render("index")
